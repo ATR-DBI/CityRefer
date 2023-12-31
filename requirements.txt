@@ -1,0 +1,12 @@
+pandas
+easydict
+plyfile
+trimesh
+pyyaml
+tqdm
+scipy
+matplotlib
+tensorboardX
+tensorboard
+transformers
+gdown

@@ -1,0 +1,14 @@
+# General
+.DS_Store
+._.DS_Store
+._README.md
+__pycache__/
+._*
+*/.nfs*
+
+# Data
+data/cityrefer
+data/sensaturban/pointgroup_data
+
+# Outputs
+outputs/
