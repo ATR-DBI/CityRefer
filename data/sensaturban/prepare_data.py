@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
+# modified from https://github.com/CurryYuan/InstanceRefer/blob/main/data/scannet/prepare_data.py
 
 import os
 import argparse
