@@ -8,6 +8,7 @@ __pycache__/
 
 # Data
 data/cityrefer
+data/sensaturban/scans/*
 data/sensaturban/pointgroup_data
 data/sensaturban/cpp_wrappers/cpp_subsampling/build
 data/sensaturban/cpp_wrappers/cpp_subsampling/*so
