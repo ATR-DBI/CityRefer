@@ -148,7 +148,8 @@ def preparePthFiles(args, files, split, outPutFolder, false_segments, AugTimes=0
             #
             # Sampling
             if args.sample_type == 'grid':
-                sub_xyz, sub_rgb, sub_labels = DataProcessing.grid_sub_sampling(xyz, rgb, labels.astype(np.int32), args.grid_size)
+                raise NotImplemented
+                #sub_xyz, sub_rgb, sub_labels = DataProcessing.grid_sub_sampling(xyz, rgb, labels.astype(np.int32), args.grid_size)
             else:
                 sub_xyz, sub_rgb, sub_labels = DataProcessing.random_sub_sampling(xyz, rgb, labels, args.random_sample_ratio)
             #
