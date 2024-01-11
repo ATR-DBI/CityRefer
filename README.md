@@ -83,7 +83,9 @@ CityRefer
 ```
 3\) Split and preprocess data.
 ```
-cd data/sensaturban
+cd data/sensaturban/cpp_wrappers
+sh compile_wrappers.sh
+cd ..
 sh prepare_data.sh
 ```
 
