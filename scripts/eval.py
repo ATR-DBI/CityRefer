@@ -56,6 +56,7 @@ def get_dataloader(args, DC, CONF, scanrefer, all_scene_list, split, use_cache=F
 def get_model(args, DC, CONF, tokenizer):
     # load model
     input_channels = int(args.use_color) * 3 + int(args.use_height) + 3 # xyz
+
     if args.model == 'cityrefer':    
         model = CityRefer(
             args = args,

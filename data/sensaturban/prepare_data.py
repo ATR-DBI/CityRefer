@@ -32,7 +32,7 @@ def read_masks(insMaskFilePathList, num_processes=1):
             mask_dic[insMaskFile] = read_mask(insMaskFile)[-1]
         return mask_dic
 
-
+'''
 def get_shifted_xyz(split_fname, insDir, result_dir, coordShift, insLabel=1, num_processes=1):
     insFilePath = os.path.join(insDir, split_fname + '_inst_nostuff.pth')
     insLabelPath = os.path.join(insDir, split_fname + '_inst_label.pth')    
@@ -66,7 +66,8 @@ def get_shifted_xyz(split_fname, insDir, result_dir, coordShift, insLabel=1, num
     # predicted instance ids
     instance_ids_pg = np.zeros(len(xyz), dtype=np.int32)  # 0: unannotated    
     mask_dic = read_masks(insMaskFilePathList, num_processes)
-    
+
+
     # predicted semantic labels
     label_ids_pg = np.zeros(len(xyz), dtype=np.int32)
     pred_inst_dir = os.path.join(result_dir, 'pred_instance')
@@ -78,9 +79,27 @@ def get_shifted_xyz(split_fname, insDir, result_dir, coordShift, insLabel=1, num
         instance_ids_pg[insMask != 0] = insLabel
         label_ids_pg[insMask != 0] = sem_lab_dic[os.path.basename(insMaskPath)]
         insLabel+=1
+
     
     xyz = xyz + np.array([float(value) for value in coordShift[split_fname+'_inst_nostuff']])
     return xyz, color, label_ids, instance_ids, label_ids_pg, instance_ids_pg, insLabel
+'''    
+
+
+def get_shifted_xyz(split_fname, insDir, coordShift):
+    insFilePath = os.path.join(insDir, split_fname + '_inst_nostuff.pth')
+    insLabelPath = os.path.join(insDir, split_fname + '_inst_label.pth')    
+    # coords/birmingham_block_11_00.npy
+    xyz, color, sem_labels, instance_labels = torch.load(insFilePath)
+    
+    # gt semantic labels & instance labels
+    print('loading:', insLabelPath)
+    label_ids, instance_ids = torch.load(insLabelPath)
+    label_ids = label_ids.astype(np.int32)
+    instance_ids = instance_ids.astype(np.int32) # -100: unannotated 
+    xyz = xyz + np.array([float(value) for value in coordShift[split_fname+'_inst_nostuff']])
+    
+    return xyz, color, label_ids, instance_ids 
 
 
 def handle_process(block_fname, insntance_dir, result_dir, coordShift, semantic_keep, objectId_to_objectName, output_dir, num_processes=1):
@@ -94,14 +113,15 @@ def handle_process(block_fname, insntance_dir, result_dir, coordShift, semantic_
     insLabel = 1
     for instance_file in glob.glob(os.path.join(insntance_dir, block_fname+'_*_inst_nostuff.pth')):
         split_fname = os.path.basename(instance_file).rstrip('_inst_nostuff.pth')
-        print('\tsplit:', split_fname)        
-        xyz, color, label_ids, instance_ids, label_ids_pg, instance_ids_pg, insLabel = get_shifted_xyz(split_fname, insntance_dir, result_dir, coordShift, insLabel, num_processes)
+        #print('\tsplit:', split_fname)        
+        #xyz, color, label_ids, instance_ids, label_ids_pg, instance_ids_pg, insLabel = get_shifted_xyz(split_fname, insntance_dir, result_dir, coordShift, insLabel, num_processes)
+        xyz, color, label_ids, instance_ids = get_shifted_xyz(split_fname, insntance_dir, coordShift)
         xyz_list.append(xyz)
         color_list.append(color)
         label_ids_list.append(label_ids)
         instance_ids_list.append(instance_ids)
-        label_ids_pg_list.append(label_ids_pg)
-        instance_ids_pg_list.append(instance_ids_pg)
+        #label_ids_pg_list.append(label_ids_pg)
+        #instance_ids_pg_list.append(instance_ids_pg)
         
     coords = np.concatenate(xyz_list)
     globalShift = coordShift['globalShift'][block_fname]
@@ -109,8 +129,10 @@ def handle_process(block_fname, insntance_dir, result_dir, coordShift, semantic_
     colors = np.concatenate(color_list)
     label_ids = np.concatenate(label_ids_list)
     all_instance_ids = np.concatenate(instance_ids_list)
-    label_ids_pg = np.concatenate(label_ids_pg_list)
-    instance_ids_pg = np.concatenate(instance_ids_pg_list)
+    #label_ids_pg = np.concatenate(label_ids_pg_list)
+    #instance_ids_pg = np.concatenate(instance_ids_pg_list)
+    label_ids_pg = []
+    instance_ids_pg = []
     instance_bboxes = {}
     # Normalize xyz coords
     colors = (colors + 1) * 127.5
@@ -158,8 +180,9 @@ def handle_process(block_fname, insntance_dir, result_dir, coordShift, semantic_
         instance_bboxes[instance_id] = bbox
 
     output_file = os.path.join(output_dir, block_fname + '.pth')
-    print('\tsaving:', output_file)
+    print('saving:', output_file)
     torch.save((coords, colors, label_ids, instance_ids, label_ids_pg, instance_ids_pg, instance_bboxes, landmark_names, landmark_ids, globalShift), output_file)
+    print()
     
 
 def _read_json(path):
@@ -173,9 +196,9 @@ def get_object_id_to_name(bbox_dir):
     print('Preparing object_id_to_name dictionary...')
     for bbox_file in glob.glob(os.path.join(bbox_dir, '*_bbox.json')):
         bbox_json = _read_json(bbox_file)
-        print('\tloading:', os.path.basename(bbox_file))
+        print('loading:', os.path.basename(bbox_file))
         # int -> str
-        objectId_to_objectName_dic[bbox_json['sceneId']] = {bbox['id']:bbox['object_name'] for bbox in bbox_json['bboxes'] if len(bbox['object_name']) > 0}
+        objectId_to_objectName_dic[bbox_json['scene_id']] = {bbox['object_id']:bbox['object_name'] for bbox in bbox_json['bboxes'] if len(bbox['object_name']) > 0}
     print()
     return objectId_to_objectName_dic        
 

@@ -57,9 +57,10 @@ def get_false_segments(false_seg_dir):
     false_segs = []
     print('Read false segments')
     for false_seg_file in glob.glob(os.path.join(false_seg_dir, '*.csv')):
-        print('\t', false_seg_file)
+        print('loading:', false_seg_file)
         false_seg_df = pd.read_csv(false_seg_file)
         false_segs.append(false_seg_df)
+    print()
 
     false_seg_df = pd.concat(false_segs)
     #false_seg_df
@@ -119,7 +120,7 @@ def preparePthFiles(args, files, split, outPutFolder, false_segments, AugTimes=0
     counter = 0
     for file in files:
        
-        print('Processing:', file)
+        print('loading:', file)
         seg_file = re.sub('.ply', '.segs.json', file)
         scene_id = os.path.basename(seg_file).rstrip('.segs.json')
 
@@ -139,9 +140,8 @@ def preparePthFiles(args, files, split, outPutFolder, false_segments, AugTimes=0
             occupied_indices = instance['pointIds']
 
             if scene_id+"_"+str(instance["id"]) in false_segments:
-                print('\tfalse segments:', scene_id+"_"+str(instance["id"]))
+                print('false segments:', scene_id+"_"+str(instance["id"]))
                 continue
-            
             labels[occupied_indices, 1] = int(instance["id"])
 
         for AugTime in range(AugTimes + 1):
@@ -172,7 +172,7 @@ def preparePthFiles(args, files, split, outPutFolder, false_segments, AugTimes=0
                 if (len(block) > 10000):
                     outFilePath = os.path.join(outPutFolder, name + str(blockNum) + '_inst_nostuff.pth')
                     outLabelPath = os.path.join(outPutFolder, name + str(blockNum) + '_inst_label.pth')
-                    print('\t', outFilePath)
+                    print('processing::', outFilePath)
                     
                     if (block[:, 2].max(0) - block[:, 2].min(0) < zThreshold):
                         block = np.append(
@@ -233,7 +233,8 @@ def preparePthFiles(args, files, split, outPutFolder, false_segments, AugTimes=0
                             torch.save((orig_sem_labels, orig_instance_labels), outLabelPath)
                     else:
                         torch.save((coords, colors), outFilePath)
-
+        print()
+        
     print('Total skipped file :%d' % counter)
     json.dump(coordShift, open(outJsonPath, 'w'))
 
@@ -268,6 +269,7 @@ if __name__ == '__main__':
     split = 'val_val_'+str(args.val_crop_size)+'m'
     valFiles = getFiles(filesOri, valSplit)
     valOutDir = os.path.join(out_dir, split)
+    print(valOutDir)
     os.makedirs(valOutDir, exist_ok=True)
     preparePthFiles(args, valFiles, split, valOutDir, false_segments, crop_size=args.val_crop_size)
 
@@ -279,17 +281,10 @@ if __name__ == '__main__':
     os.makedirs(testOutDir, exist_ok=True)
     preparePthFiles(args, testFiles, split, testOutDir, false_segments, crop_size=args.val_crop_size)
 
-    # train with train_crop
-    trainFiles = getFiles(filesOri, trainSplit)
-    split = 'train'
-    trainOutDir = os.path.join(out_dir, split)
-    os.makedirs(trainOutDir, exist_ok=True)
-    preparePthFiles(args, trainFiles, split, trainOutDir, false_segments, AugTimes=args.aug_times, crop_size=args.train_crop_size)
-    
     # train with val_crop
     trainFiles = getFiles(filesOri, trainSplit)
     split = 'train_'+str(args.val_crop_size)+'m'
     trainOutDir = os.path.join(out_dir, split)
     os.makedirs(trainOutDir, exist_ok=True)
-    preparePthFiles(args, trainFiles, split, trainOutDir, false_segments, crop_size=args.val_crop_size)    
+    preparePthFiles(args, trainFiles, split, trainOutDir, false_segments, crop_size=args.train_crop_size)    
 

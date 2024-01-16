@@ -1,13 +1,15 @@
 #!/bin/bash
 
 SPLIT=balance_split
-DATA_TYPE=random-50_crop-250
+SAMPLE_RATIO=50
+CROP_SIZE=250
+DATA_TYPE=random-${SAMPLE_RATIO}_crop-${CROP_SIZE}
 ROOT_DIR=. # TODO: change this
 OUT_DIR=pointgroup_data
 NUM_PROC=20
 
 # split data
-python split_data.py --random_sample_ratio 50 --train_crop_size 50 --val_crop_size 250
+python split_data.py --random_sample_ratio $SAMPLE_RATIO --train_crop_size $CROP_SIZE --val_crop_size $CROP_SIZE
 
 # preprocessing
 EVAL_TYPE=val_val_250m

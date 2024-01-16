@@ -5,7 +5,7 @@ from easydict import EasyDict
 # path
 CONF = EasyDict()
 CONF.PATH = EasyDict()
-CONF.PATH.BASE = "/home/dbi-data5/miyanishi/Project/CityRefer"  # TODO: change this
+CONF.PATH.BASE = "/home/dbi-data7/miyanishi/Project/CityRefer"  # TODO: change this
 CONF.PATH.DATA = os.path.join(CONF.PATH.BASE, "data")
 CONF.PATH.SCAN = os.path.join(CONF.PATH.DATA, "sensaturban")
 CONF.PATH.LIB = os.path.join(CONF.PATH.BASE, "lib")
