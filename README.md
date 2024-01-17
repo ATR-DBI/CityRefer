@@ -105,7 +105,7 @@ sh prepare_data.sh
 - Evaluation of trained CityRefer models with the test dataset:
 
   ```shell
-  python scripts/eval.py --eval_split test --folder <model_dir> --force --gpu 0
+  python scripts/eval.py --eval_split val --folder <model_dir> --force --gpu 0
   ```
   <model_dir> corresponds to the directory path including `model.pth'.
 
