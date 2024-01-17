@@ -128,10 +128,10 @@ sh prepare_data.sh
 
 ## Pre-trained Models
 <!-- | Input | ACC@0.25 | Checkpoints -->
-| Input | Accuracy | Weights
+| Input | Accuracy (test) | Weights
 |--|--|--|
-| xyz+color | 0.312 | [weights](https://drive.google.com/file/d/1BzQ0-UxJfjRTSvAf1M8PezuJGgx2FaNP/view?usp=drive_link) 
-| xyz+color+landmark | 0.320 | [weights](https://drive.google.com/file/d/1CxtjeC1zqUA0F_feaiXCbSh02NOF9tTi/view?usp=drive_link) 
+| xyz+color | 0.312 | [weights](https://drive.google.com/file/d/1txGmqE6Xvn16o1rE4CyGoXaEHY5DXS9b) 
+| xyz+color+landmark | 0.320 | [weights](https://drive.google.com/file/d/1twzSWqTj8FL6LIVdaljmrG394LMo3QZ8) 
 
 
 ## Citation
